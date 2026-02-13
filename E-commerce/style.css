@@ -1,0 +1,14 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.navbar {
+    background-color: rgb(134, 100, 230);
+    color: whitesmoke;
+}
+.searchbutt{
+    background-color: rgb(106, 106, 160);
+    color: whitesmoke;
+}
