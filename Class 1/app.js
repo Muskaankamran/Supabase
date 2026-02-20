@@ -21,12 +21,12 @@ window.addEventListener(DOMContentLoaded, async () => {
             </div>`;
 
         });
-         if(error) console.log(error);
+        if (error) console.log(error);
 
-    }catch (error) {
-    console.log(error);
-    
-  }
+    } catch (error) {
+        console.log(error);
+
+    }
 })
 function editPost(event) {
     var card = event.target.parentNode.parentNode;
@@ -50,8 +50,8 @@ async function post() {
         try {
             const { data, error } = await supabase.from('post').insert({ title, description, img_url: cardbg }).select("*")
             console.log(data[0]);
-        if (error) console.log("post error:" , error);
-              posts.innerHTML += `
+            if (error) console.log("post error:", error);
+            posts.innerHTML += `
          <div class="card m-2">
               <div style="background-image: url(${cardbg}); background-size: cover;" class="card-body">
                 <h5 class="card-title">${title}</h5>
@@ -62,12 +62,12 @@ async function post() {
                   <button onclick="deletePost(event)" class="btn mydelete">Delete</button>
                </div>
             </div>`;
-        document.getElementById("title").value = "";
-        document.getElementById("discription").value = "";
-     } catch (error) {
-       console.log(error);
+            document.getElementById("title").value = "";
+            document.getElementById("discription").value = "";
+        } catch (error) {
+            console.log(error);
         }
-    }  else {
+    } else {
         Swal.fire({
             icon: "error",
             title: "Empty Post...",

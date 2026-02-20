@@ -11,7 +11,7 @@ function showLogin() {
     document.getElementById("signUp").style.display = "none";
     document.getElementById("login").style.display = "flex";
     document.getElementById("btns1").style.backgroundColor = "white";
-    document.getElementById("btns2").style.backgroundColor = "#b49ec1";
+    document.getElementById("btns2").style.backgroundColor = "#cdb4db";
 }
 
 window.showLogin = showLogin;
