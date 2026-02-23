@@ -1,118 +1,114 @@
-body {
-    font-family: 'Gentium Plus', serif;
-    background: linear-gradient(50deg, #ffc8dd 50%, #bde0fe 50%);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+* {
     margin: 0;
-}
-
-.content {
-    background-color: #ffffff;
-    padding: 40px 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-}
-
-.nav {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
-    border-radius: 10px;
+    padding: 0;
     overflow: hidden;
 }
 
-.nav .btn {
-    flex: 1;
+/* Navbar Main */
+.custom-navbar {
+    background-color: #7fa1c3;
+    padding: 15px 30px;
+    /* top-bottom | left-right */
+}
+
+/* Brand */
+.navbar-brand {
+    font-size: 22px;
     font-weight: 600;
-    padding: 10px 0;
-    transition: all 0.3s ease;
-}
-
-.nav .btn1 {
-    background-color: white;
-    border-right: 1px solid #cdb4db;
-}
-
-.nav .btn2 {
-    background-color: #cdb4db;
-}
-
-.main {
-    display: flex;
-    flex-direction: column;
-}
-
-.loginClass,
-.signupClass {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-#signUp {
-    display: none;
-}
-
-input[type="text"],
-input[type="password"],
-input[type="email"] {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #cdb4db;
-    border-radius: 8px;
-    font-size: 15px;
-    outline: none;
-    transition: 0.3s;
-}
-
-input[type="text"]:focus,
-input[type="password"]:focus,
-input[type="email"]:focus {
-    border-color: #a67acc;
-    box-shadow: 0 0 5px rgba(163, 122, 204, 0.5);
-}
-
-input::placeholder {
-    color: #cdb4db;
-}
-
-button {
-    background-color: #c67bdd;
     color: white;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    padding: 12px;
-    cursor: pointer;
-    font-size: 15px;
+}
+
+/* Search Input */
+.search-input {
+    width: 200px;
+    margin-right: 10px;
+}
+
+/* Search Button */
+.btn-search {
+    margin-right: 10px;
+    padding: 6px 18px;
+    background-color: #2a649b;
+    color: white;
+
+}
+
+.btn-search:hover {
+    margin-right: 10px;
+    padding: 6px 18px;
+    background-color: #2a649b;
+    color: white;
+}
+
+/* Logout Button */
+.btn-danger {
+    padding: 6px 18px;
+}
+
+/* Responsive Adjustment */
+@media (max-width: 768px) {
+    .custom-navbar {
+        padding: 10px 15px;
+    }
+
+    .search-input {
+        width: 130px;
+    }
+}
+
+.myBtn {
+    background-color: rgb(84, 133, 224);
+    color: whitesmoke;
+    width: 100px;
+    border-radius: 5px;
+}
+
+.myBtn:hover {
+    background-color: rgb(84, 133, 224);
+    color: whitesmoke;
+    width: 100px;
+    border-radius: 5px;
+}
+
+.bgImg {
+    width: 50px;
+    height: 50px;
+}
+
+.bgImg:hover {
+    transform: scale(1.1);
     transition: 0.3s;
 }
 
-button:hover {
-    background-color: #a35ac0;
+.selectedImg {
+    border: 2px solid #0b0c0d;
+    border-radius: 5px;
 }
 
-.enquire {
-    display: flex;
-    justify-content: space-between;
-    font-size: 13px;
+.myedit {
+    background-color: rgb(6, 38, 99);
+    color: whitesmoke;
+    width: 100px;
+    border-radius: 5px;
 }
 
-a {
-    color: #6b4f8c;
-    text-decoration: none;
+.myedit:hover {
+    background-color: rgb(6, 38, 99);
+    color: whitesmoke;
+    width: 100px;
+    border-radius: 5px;
 }
 
-a:hover {
-    text-decoration: underline;
+.mydelete {
+    background-color: rgb(176, 29, 0);
+    color: whitesmoke;
+    width: 100px;
+    border-radius: 5px;
 }
 
-@media(max-width: 480px) {
-    .content {
-        padding: 30px 20px;
-    }
+.mydelete:hover {
+    background-color: rgb(176, 29, 0);
+    color: whitesmoke;
+    width: 100px;
+    border-radius: 5px;
 }

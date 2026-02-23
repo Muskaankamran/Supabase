@@ -2,7 +2,47 @@ import supabase from "./supabase.js";
 
 var cardbg;
 
-// FETCH POSTS
+async function searchPosts() {
+    var searchValue = document.getElementById("searchValue").value
+    var posts = document.getElementById("posts");
+    posts.innerHTML = "";
+    try {
+        let query = supabase.from("post").select("*").order('id', { ascending: false })
+        if (searchValue.trim()) {
+            // query = query.ilike("title", `%${searchValue}%`)
+            query = query.or(`title.ilike.%${searchValue}%, discription.ilike.%${searchValue}%`)
+        }
+        const { data, error } = await query
+        console.log(data);
+        if (data.length === 0) {
+            posts.innerHTML = `<h5>No Posts Found </h5>`
+            alert("No posts found")
+        }
+        data.forEach((post) => {
+            var posts = document.getElementById("posts");
+            posts.innerHTML += `
+           <div class="card m-2">
+              <div style="background-image: url(${post.img_url}); background-size: cover;" class="card-body">
+                <h5 class="card-title">${post.title}</h5>
+                <p class="card-text">${post.discription}</p>
+              </div>
+              <div class="ms-auto m-2">
+                  <button onclick="editPost(event)" class="btn myedit">Edit</button>
+                  <button onclick="deletePost(event)" class="btn mydelete">Delete</button>
+               </div>
+            </div>
+            `;
+        });
+        if (error) console.log("Search error", error);
+    }
+    catch (error) {
+        console.log(error);
+    }
+}
+
+
+
+
 window.addEventListener("DOMContentLoaded", async () => {
     try {
         const { data, error } = await supabase.from('post').select("*");
@@ -12,19 +52,20 @@ window.addEventListener("DOMContentLoaded", async () => {
             return;
         }
 
-        data.forEach(post => {
-            var posts = document.getElementById("posts");
+        var posts = document.getElementById("posts");
+        posts.innerHTML = "";
 
+        data.forEach(post => {
             posts.innerHTML += `
-            <div class="card m-2">
-                <div style="background-image: url(${post.img_url}); background-size: cover;" class="card-body">
-                    <h5 class="card-title">${post.title}</h5>
-                    <p class="card-text">${post.description}</p>
-                </div>
-                <div class="ms-auto m-2">
-                    <button onclick="editPost(event)" class="btn myedit">Edit</button>
-                    <button onclick="deletePost(event)" class="btn mydelete">Delete</button>
-                </div>
+         <div class="card m-2">
+              <div style="background-image: url(${post.img_url}); background-size: cover;" class="card-body">
+                <h5 class="card-title">${post.title}</h5>
+                <p class="card-text">${post.discription}</p>
+              </div>
+              <div class="ms-auto m-2">
+                  <button onclick="editPost(event)" class="btn myedit">Edit</button>
+                  <button onclick="deletePost(event)" class="btn mydelete">Delete</button>
+               </div>
             </div>`;
         });
 
@@ -33,8 +74,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-
-// EDIT POST (UI only, no DB change)
+// Edit Post
 function editPost(event) {
     var card = event.target.parentNode.parentNode;
 
@@ -47,19 +87,18 @@ function editPost(event) {
     card.remove();
 }
 
-
-// DELETE POST (UI only, no DB delete)
+// Delete Post
 function deletePost(event) {
     var card = event.target.parentNode.parentNode;
     card.remove();
 }
 
-
-// ADD POST
+// Post Function
 async function post() {
 
     var title = document.getElementById("title").value;
     var discription = document.getElementById("discription").value;
+
     var posts = document.getElementById("posts");
 
     if (title.trim() && discription.trim()) {
@@ -68,28 +107,28 @@ async function post() {
 
             const { data, error } = await supabase
                 .from('post')
-                .insert([{
-                    title: title,
-                    description: discription,
+                .insert({
+                    title,
+                    discription: discription,
                     img_url: cardbg
-                }])
+                })
                 .select("*");
 
             if (error) {
-                console.log("Post error:", error);
+                console.log("post error:", error);
                 return;
             }
 
             posts.innerHTML += `
-            <div class="card m-2">
-                <div style="background-image: url(${cardbg}); background-size: cover;" class="card-body">
-                    <h5 class="card-title">${title}</h5>
-                    <p class="card-text">${discription}</p>
-                </div>
-                <div class="ms-auto m-2">
-                    <button onclick="editPost(event)" class="btn myedit">Edit</button>
-                    <button onclick="deletePost(event)" class="btn mydelete">Delete</button>
-                </div>
+         <div class="card m-2">
+              <div style="background-image: url(${cardbg}); background-size: cover;" class="card-body">
+                <h5 class="card-title">${title}</h5>
+                <p class="card-text">${discription}</p>
+              </div>
+              <div class="ms-auto m-2">
+                  <button onclick="editPost(event)" class="btn myedit">Edit</button>
+                  <button onclick="deletePost(event)" class="btn mydelete">Delete</button>
+               </div>
             </div>`;
 
             document.getElementById("title").value = "";
@@ -100,17 +139,13 @@ async function post() {
         }
 
     } else {
-        Swal.fire({
-            icon: "error",
-            title: "Empty Post...",
-            text: "Enter title & description",
-        });
+        alert("Enter title & description");
     }
 }
 
-
-// SELECT IMAGE
+// Select Image
 function selectImg(src, event) {
+
     cardbg = src;
 
     var bgImg = document.querySelectorAll(".bgImg");
@@ -121,10 +156,8 @@ function selectImg(src, event) {
 
     event.target.classList.add("selectedImg");
 }
-
-
-// MAKE FUNCTIONS GLOBAL
-window.deletePost = deletePost;
+window.searchPosts = searchPosts;
 window.editPost = editPost;
+window.deletePost = deletePost;
 window.post = post;
 window.selectImg = selectImg;
