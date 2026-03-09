@@ -32,7 +32,20 @@ async function login(event) {
     }
 }
 window.login = login;
+async function google(event) {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: 'http://127.0.0.1:5500/dashboard.html'
+        }
+    })
+    if (error) {
+        console.log(error);
+        alert(error.message)
+    }
+}
 
+window.google = google;
 async function signup(event) {
     event.preventDefault();
     let email = document.getElementById("signupEmail").value;

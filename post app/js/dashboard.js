@@ -3,23 +3,30 @@ import supabase from "./supabase.js";
 var cardbg;
 
 async function searchPosts() {
-    var searchValue = document.getElementById("searchValue").value
+    var searchValue = document.getElementById("searchValue").value;
     var posts = document.getElementById("posts");
     posts.innerHTML = "";
+
     try {
-        let query = supabase.from("post").select("*").order('id', { ascending: false })
+        let query = supabase.from("post").select("*").order('id', { ascending: false });
+
         if (searchValue.trim()) {
-            // query = query.ilike("title", `%${searchValue}%`)
-            query = query.or(`title.ilike.%${searchValue}%, discription.ilike.%${searchValue}%`)
+            query = query.or(`title.ilike.%${searchValue}%,discription.ilike.%${searchValue}%`);
         }
-        const { data, error } = await query
-        console.log(data);
-        if (data.length === 0) {
-            posts.innerHTML = `<h5>No Posts Found </h5>`
-            alert("No posts found")
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.log("Search error", error);
+            return;
         }
+
+        if (!data || data.length === 0) {
+            posts.innerHTML = `<h5>No Posts Found</h5>`;
+            return;
+        }
+
         data.forEach((post) => {
-            var posts = document.getElementById("posts");
             posts.innerHTML += `
            <div class="card m-2">
               <div style="background-image: url(${post.img_url}); background-size: cover;" class="card-body">
@@ -27,25 +34,20 @@ async function searchPosts() {
                 <p class="card-text">${post.discription}</p>
               </div>
               <div class="ms-auto m-2">
-                  <button onclick="editPost(event)" class="btn myedit">Edit</button>
-                  <button onclick="deletePost(event)" class="btn mydelete">Delete</button>
+                  <button onclick="editPost(event, ${post.id})" class="btn myedit">Edit</button>
+                  <button onclick="deletePost(event, ${post.id})" class="btn mydelete">Delete</button>
                </div>
-            </div>
-            `;
+            </div>`;
         });
-        if (error) console.log("Search error", error);
-    }
-    catch (error) {
+
+    } catch (error) {
         console.log(error);
     }
 }
 
-
-
-
 window.addEventListener("DOMContentLoaded", async () => {
     try {
-        const { data, error } = await supabase.from('post').select("*");
+        const { data, error } = await supabase.from('post').select("*").order('id', { ascending: false });
 
         if (error) {
             console.log(error);
@@ -63,8 +65,8 @@ window.addEventListener("DOMContentLoaded", async () => {
                 <p class="card-text">${post.discription}</p>
               </div>
               <div class="ms-auto m-2">
-                  <button onclick="editPost(event)" class="btn myedit">Edit</button>
-                  <button onclick="deletePost(event)" class="btn mydelete">Delete</button>
+                  <button onclick="editPost(event, ${post.id})" class="btn myedit">Edit</button>
+                  <button onclick="deletePost(event, ${post.id})" class="btn mydelete">Delete</button>
                </div>
             </div>`;
         });
@@ -73,9 +75,31 @@ window.addEventListener("DOMContentLoaded", async () => {
         console.log(error);
     }
 });
+//edit
+async function editPost(event, id) {
 
-// Edit Post
-function editPost(event) {
+    const {
+        data: { user },
+        error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+        Swal.fire("Login Required", "You must login first!", "warning");
+        return;
+    }
+
+    // check if post belongs to this user
+    const { data, error } = await supabase
+        .from("post")
+        .select("*")
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+    if (!data || data.length === 0) {
+        Swal.fire("Not Allowed", "You cannot edit this post!", "error");
+        return;
+    }
+
     var card = event.target.parentNode.parentNode;
 
     var title = card.children[0].children[0].innerHTML;
@@ -86,31 +110,76 @@ function editPost(event) {
 
     card.remove();
 }
+//delete 
+async function deletePost(event, id) {
 
-// Delete Post
-function deletePost(event) {
+    const {
+        data: { user },
+        error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+        Swal.fire("Login Required", "You must login to delete posts!", "warning");
+        return;
+    }
+
+    const confirm = await Swal.fire({
+        title: "Are you sure?",
+        text: "This post will be deleted!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes Delete"
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    const { data, error } = await supabase
+        .from("post")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .select();
+
+    if (error) {
+        Swal.fire("Error deleting post");
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        Swal.fire("You cannot delete this post!");
+        return;
+    }
+
     var card = event.target.parentNode.parentNode;
     card.remove();
+
+    Swal.fire("Deleted!", "Post removed successfully", "success");
 }
 
-// Post Function
 async function post() {
 
     var title = document.getElementById("title").value;
     var discription = document.getElementById("discription").value;
-
     var posts = document.getElementById("posts");
 
     if (title.trim() && discription.trim()) {
 
         try {
 
+            const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+            if (userError || !user) {
+                Swal.fire("You must login first!");
+                return;
+            }
+
             const { data, error } = await supabase
                 .from('post')
                 .insert({
                     title,
-                    discription: discription,
-                    img_url: cardbg
+                    discription,
+                    img_url: cardbg,
+                    user_id: user.id
                 })
                 .select("*");
 
@@ -126,8 +195,8 @@ async function post() {
                 <p class="card-text">${discription}</p>
               </div>
               <div class="ms-auto m-2">
-                  <button onclick="editPost(event)" class="btn myedit">Edit</button>
-                  <button onclick="deletePost(event)" class="btn mydelete">Delete</button>
+                  <button onclick="editPost(event, ${data[0].id})" class="btn myedit">Edit</button>
+                  <button onclick="deletePost(event, ${data[0].id})" class="btn mydelete">Delete</button>
                </div>
             </div>`;
 
@@ -139,11 +208,10 @@ async function post() {
         }
 
     } else {
-        alert("Enter title & description");
+        Swal.fire("Enter title & description");
     }
 }
 
-// Select Image
 function selectImg(src, event) {
 
     cardbg = src;
@@ -156,6 +224,7 @@ function selectImg(src, event) {
 
     event.target.classList.add("selectedImg");
 }
+
 window.searchPosts = searchPosts;
 window.editPost = editPost;
 window.deletePost = deletePost;
